@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "goserver"
+  labels:
+    app: "goserver"
+spec:
+  containers:
+    - name: goserver
+      image: "haroldovinente/hello-go:latest"
+# criar pod
+# kubectl apply -f k8s/pod.yaml
+
+# lista pods
+# kubectl get pods
+
+# acessar appplication/container que esta em um pod no kubernetes
+#  kubectl port-forward pod/goserver 8000:80

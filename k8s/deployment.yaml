@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goserver
+  labels:
+    app: goserver
+spec:
+  selector:
+    matchLabels:
+      app: goserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "goserver"
+    spec:
+      containers:
+        - name: goserver
+          image: "haroldovinente/hello-go:v5.5"
+
+          # vCPU -> 1000m (milicores) 500m. 0.5
+          # resources:
+          #   requests: # minimo para a aplicação rodar, -> sequestrando(reservando) recursos do cluster para -> pod
+          #     cpu: "0.3"
+          #     memory: 20Mi
+          #   limits: # até onde o pod deve/pode utilizar de recurso no cluster.
+          #     cpu: "0.3"
+          #     memory: 25Mi
+
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            periodSeconds: 3
+            failureThreshold: 30
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            periodSeconds: 3
+            failureThreshold: 1
+            # initialDelaySeconds: 10
+
+          # existem 3 tipos de livenessProbe: http(faz requisição http)
+          # comand(executa um comando dentro do container)
+          # tcp(tenta estabelecer uma conexão tcp)
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000 # porta do container
+            periodSeconds: 5
+            failureThreshold: 1 # limite de vezes que dará problema
+            timeoutSeconds: 1 # limite de tempo da request
+            successThreshold: 1 # vezes que testara se a aplication esta ok
+            # initialDelaySeconds: 15
+
+          envFrom:
+            - configMapRef:
+                name: goserver-env
+            - secretRef:
+                name: goserver-secret
+
+          volumeMounts:
+            - mountPath: "/go/myfamily"
+              name: config
+              # readOnly: true
+
+      volumes:
+        - name: config
+          configMap:
+            name: configmap-family
+            items:
+              - key: members
+                path: "family.txt"
+
+          # env:
+          #   - name: NAME
+          #     # value: "Haroldo"
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: goserver-env
+          #         key: NAME
+
+          #   - name: AGE
+          #     # value: "31"
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: goserver-env
+          #         key: AGE
+# ver historico
+# kubectl rollout history deployment goserver
+# volta para a versão anterior
+# kubectl rollout undo deployment goserver
+# volta para uma revisão especifica
+# kubectl rollout undo deployment goserver --to-revision=2
+# informações:eventos,replicas sobre deployment
+# kubectl describe deployment goserver

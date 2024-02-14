@@ -1,0 +1,30 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker
+  - role: worker
+# kind create cluster --config=k8s/kind.yaml --name=fullcycle
+# kubectl cluster-info --context kind-fullcycle
+
+# lista outros clusters
+# kubectl config get-clusters
+
+# mudar de context
+# kubectl config use-context arn:aws:eks:sa-east-1:785365831681:cluster/alura-cluster
+
+# deletar cluster
+# kind delete clusters hlg.k8s.ecom.gpa.digital
+
+# Eu vou te sugerir apagar tudo, inclusive o cluster, com os comandos:
+
+# sudo docker rm -f $(docker ps -a -q)
+
+# sudo docker rmi -f $(docker images -q)
+
+# sudo docker system prune -af
+
+# sudo docker volume prune -f
+
